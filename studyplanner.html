@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Study Planner</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, orange, pink, purple);
+}
+
+/* CENTER */
+.center {
+    text-align: center;
+    margin-top: 60px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    color: black;
+    width: 80%;
+    margin: auto;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+}
+
+/* BUTTON */
+button {
+    padding: 12px;
+    margin: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.start-btn {
+    background: black;
+    color: white;
+    transition: 0.3s;
+}
+.start-btn:hover {
+    transform: scale(1.1);
+    background: white;
+    color: black;
+}
+
+/* INPUT */
+input {
+    padding: 10px;
+    margin: 10px;
+}
+
+/* HIDE */
+#plannerPage, #finalPage {
+    display: none;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background: black;
+    color: white;
+}
+
+td, th {
+    padding: 10px;
+    text-align: center;
+}
+
+/* ROW COLORS */
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+tr:nth-child(odd) {
+    background: white;
+}
+
+/* STATUS */
+.done { color: green; font-weight: bold; }
+.notdone { color: red; font-weight: bold; }
+
+/* PROGRESS */
+.progress-container {
+    width: 100%;
+    background: #ddd;
+    border-radius: 20px;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    height: 20px;
+    width: 0%;
+    background: green;
+    border-radius: 20px;
+}
+
+/* TIMER */
+.timer {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* STREAK */
+.streak {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div id="startPage" class="center">
+    <h1>Plan Smart. Study Better.</h1>
+    <p>Small steps every day lead to big success</p>
+
+    <input type="text" id="nameInput" placeholder="Enter your study name">
+
+    <h3>WHAT'S YOUR GOAL?</h3>
+    <input type="radio" name="goal"> Crack IIT <br>
+    <input type="radio" name="goal"> Score 95%+ <br>
+    <input type="radio" name="goal"> Become a Coder <br>
+    <input type="radio" name="goal"> None of these <br>
+
+    <button class="start-btn" onclick="startPlanner()">Start ??</button>
+</div>
+
+<!-- PAGE 2 -->
+<div id="plannerPage">
+
+<div class="streak" id="streakBox"></div>
+
+<div class="timer">
+    <h4>Study Timer</h4>
+    <span id="time">25:00</span><br>
+    <button onclick="startTimer()">Start</button>
+</div>
+
+<div class="card">
+
+<h2 id="welcomeText"></h2>
+
+<p>This is your personal space to grow. Stay consistent. Stay focused. Your future starts today.</p>
+
+<h3 id="progressText">0/15 tasks completed</h3>
+
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<table>
+<tr>
+<th>S.No</th>
+<th>Subject</th>
+<th>Work</th>
+<th>Completed</th>
+<th>Not Completed</th>
+</tr>
+
+<script>
+for(let i=1;i<=15;i++){
+document.write(`
+<tr>
+<td>${i}</td>
+<td><input type="text"></td>
+<td><input type="text"></td>
+<td><button onclick="markDone(this)">?</button></td>
+<td><button onclick="markNotDone(this)">?</button></td>
+</tr>
+`);
+}
+</script>
+
+</table>
+
+<button class="start-btn" onclick="goNext()">Next Page</button>
+
+</div>
+</div>
+
+<!-- PAGE 3 -->
+<div id="finalPage" class="center">
+<div class="card">
+
+<h2>Thank You for Visiting!</h2>
+
+<p>
+Thank you for being a part of this journey. Plan your work, stay consistent, and trust the process. 
+Every day is a new chance to improve. Keep growing and never give up. Your future is in your hands.
+</p>
+
+<h3>FOUNDER: Gayanthika.sri</h3>
+
+</div>
+</div>
+
+<script>
+let completed = 0;
+
+function startPlanner(){
+let name = document.getElementById("nameInput").value;
+if(name===""){ alert("Enter name"); return; }
+
+document.getElementById("startPage").style.display="none";
+document.getElementById("plannerPage").style.display="block";
+
+document.getElementById("welcomeText").innerText="Welcome " + name;
+
+// STREAK
+let today = new Date().toDateString();
+let last = localStorage.getItem("lastVisit");
+let streak = localStorage.getItem("streak") || 0;
+
+if(last === today){
+document.getElementById("streakBox").innerText = streak + " Day Streak";
+}else{
+if(last){
+streak = parseInt(streak) + 1;
+}else{
+streak = 1;
+}
+localStorage.setItem("streak", streak);
+localStorage.setItem("lastVisit", today);
+document.getElementById("streakBox").innerText = streak + " Day Streak";
+}
+}
+
+function updateProgress(){
+let percent = (completed/15)*100;
+document.getElementById("progressBar").style.width = percent + "%";
+document.getElementById("progressText").innerText = completed + "/15 tasks completed";
+}
+
+function markDone(btn){
+if(!btn.clicked){
+completed++;
+btn.clicked = true;
+updateProgress();
+}
+btn.parentElement.innerHTML = "<span class='done'>? Completed</span>";
+}
+
+function markNotDone(btn){
+btn.parentElement.innerHTML = "<span class='notdone'>? Not Completed</span>";
+}
+
+function goNext(){
+document.getElementById("plannerPage").style.display="none";
+document.getElementById("finalPage").style.display="block";
+}
+
+/* TIMER */
+let time = 1500;
+function startTimer(){
+let interval = setInterval(()=>{
+let min = Math.floor(time/60);
+let sec = time%60;
+document.getElementById("time").innerText =
+(min<10?"0":"")+min + ":" + (sec<10?"0":"")+sec;
+time--;
+if(time<0) clearInterval(interval);
+},1000);
+}
+</script>
+
+</body>
+</html>
